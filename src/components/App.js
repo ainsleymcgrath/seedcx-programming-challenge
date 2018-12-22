@@ -1,12 +1,23 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+import { openSubcriptionToCoinbaseWebSocket } from "../helpers";
+import { WEBSOCKET_URL } from "../CONSTANTS";
+
 export default class App extends React.Component {
   constructor() {
     super();
-    this.state = { hello: "world" };
+    this.state = { lol: [] };
 
     this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentDidMount() {
+    openSubcriptionToCoinbaseWebSocket(WEBSOCKET_URL, msg =>
+      this.setState(state => ({
+        lol: [...state.lol, JSON.parse(msg.data).changes]
+      }))
+    );
   }
 
   handleChange(e) {
@@ -16,16 +27,6 @@ export default class App extends React.Component {
   }
 
   render() {
-    return (
-      <div>
-        <p>hello</p>
-        <input
-          type="text"
-          name="hello"
-          onChange={this.handleChange}
-          value={this.state.hello}
-        />
-      </div>
-    );
+    return this.state.lol.map(lol => <div>{lol}</div>);
   }
 }
