@@ -1,0 +1,25 @@
+{
+  "name": "seedcx-code-challenge",
+  "version": "1.0.0",
+  "description": "My implementation of a cryptocurrency order book for the Seed CX technical presecreen assessment.",
+  "main": "index.js",
+  "dependencies": {
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "bulma": "^0.7.2",
+    "node-sass": "^4.10.0",
+    "parcel-bundler": "^1.10.3"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "author": "Ainsley McGrath",
+  "license": "ISC"
+}
