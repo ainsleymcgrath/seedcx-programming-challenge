@@ -6,14 +6,7 @@ export function openSubcriptionToCoinbaseWebSocket(url, callback) {
       JSON.stringify({
         type: "subscribe",
         product_ids: ["BTC-USD"],
-        channels: [
-          "level2",
-          "heartbeat",
-          {
-            name: "ticker",
-            product_ids: ["BTC-USD"]
-          }
-        ]
+        channels: ["level2", "heartbeat"]
       })
     );
 
