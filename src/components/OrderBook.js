@@ -3,19 +3,29 @@ import OrderRow from "./OrderRow";
 
 export default function OrderBook(props) {
   return (
-    <div>
-      <h1>Buy</h1>
-      <ul>
-        {props.orders.buy.map(o => (
-          <OrderRow {...o} />
+    <div className="columns is-multiline is-mobile">
+      <div className="column is-full">
+        <div className="level is-mobile">
+          <div className="level-left">
+            <span className="level-item ">PRICE</span>
+          </div>
+          <div className="level-right">
+            <span className="level-item ">SIZE</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="column is-full has-text-danger">
+        {props.asks.map(o => (
+          <OrderRow {...o} key={o.price} />
         ))}
-      </ul>
-      <h1>Sell</h1>
-      <ul>
-        {props.orders.sell.map(o => (
-          <OrderRow {...o} />
+      </div>
+      <hr className="column is-full" />
+      <div className="column is-full has-text-success">
+        {props.bids.map(o => (
+          <OrderRow {...o} key={o.price} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

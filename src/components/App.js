@@ -8,12 +8,9 @@ export default class App extends React.Component {
   constructor() {
     super();
     this.state = {
-      buy: [],
-      sell: [],
-      ordersShown: 20
-      // snapshot: {},
-      // snapshotCount: 0,
-      // stateChanges: 0
+      bids: {},
+      asks: {},
+      ordersShown: 5
     };
   }
 
@@ -21,27 +18,49 @@ export default class App extends React.Component {
     openSubcriptionToCoinbaseWebSocket(WEBSOCKET_URL, msg => {
       const msgData = JSON.parse(msg.data);
       if (msgData.type === "l2update") {
-        const [type, price, size] = msgData.changes[0];
-        this.setState(state => {
-          if (size > 0 && state[type].length < state.ordersShown)
-            return {
-              [type]: [{ price, size }, ...state[type]]
-                .map(x => x)
-                .slice(0, state.ordersShown),
-              stateChanges: (state.stateChanges += 1)
-            };
-        });
+        const [_type, price, size] = msgData.changes.flat();
+        const type = [`${_type === "buy" ? "bids" : "asks"}`];
+
+        const orderBookUpdate = {
+          [parseFloat(price).toFixed(2)]: size
+        };
+
+        if (parseInt(size) !== 0) {
+          this.setState(state => ({
+            [type]: { ...state[type], ...orderBookUpdate }
+          }));
+        }
       }
       if (msgData.type == "snapshot") {
-        // ???
+        (() => {})();
+        // this.setState({
+        //   bids: msgData.bids
+        //     .flatMap(([price, size]) => ({
+        //       [parseFloat(price).toFixed(2)]: size
+        //     }))
+        //     .reduce((acc, cur) => ({ ...acc, ...cur }), {}),
+        //   asks: msgData.asks
+        //     .flatMap(([price, size]) => ({
+        //       [parseFloat(price).toFixed(2)]: size
+        //     }))
+        //     .reduce((acc, cur) => ({ ...acc, ...cur }), {})
+        // });
       }
     });
   }
 
   render() {
+    const rearrange = x =>
+      Object.keys(x)
+        .map(k => ({ price: k, size: x[k] }))
+        .slice(-this.state.ordersShown);
+
     return (
       <div>
-        <OrderBook orders={this.state} />
+        <OrderBook
+          bids={rearrange(this.state.bids)}
+          asks={rearrange(this.state.asks)}
+        />
       </div>
     );
   }
