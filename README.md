@@ -17,9 +17,20 @@ Enclosed: my best attempt at building an Orderbook to hopefully prove my worth t
 nvm use
 ```
 
-Install dependencies & run run run!
+Install dependencies & go go go!
 
 ```bash
 npm i
 npm run start
 ```
+
+
+
+## Thinking
+
+### Design Decisions
+
+This application listens to the `l2update` channel on the Coinbase WebSocket API. Only "l2update" message types are processed. The most recently updated bids and asks for the chosen currency are displayed on the orderbook table.
+
+### Head Scratchers
+
