@@ -1,5 +1,5 @@
-import React, { Fragment } from "react";
-import { toSixSigFigs, toTwoDecimals } from "../helpers";
+import React, {Fragment} from 'react';
+import {toSixSigFigs, toTwoDecimals} from '../helpers';
 
 export default function MidpointPriceRow(props) {
   return (
@@ -7,15 +7,13 @@ export default function MidpointPriceRow(props) {
       <hr />
       <div className="column is-full">
         <div className="level is-mobile">
-          <div className="level-left">
-            <span className="level-item">{toTwoDecimals(props.price)}</span>
-          </div>
+          <span className="level-item">{toTwoDecimals(props.price)}</span>
           <span className="level-item">
-            {props.side === "buy" ? "📈" : "📉"}
+            {toTwoDecimals(
+              ((props.price - props.prevPrice) / props.prevPrice) * 100,
+            )}
+            %
           </span>
-          <div className="level-right">
-            <span className="level-item">{toSixSigFigs(props.size)}</span>
-          </div>
         </div>
       </div>
       <hr />
