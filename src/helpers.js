@@ -1,3 +1,4 @@
+// wrapper for opening up the message stream from the Coinbase websocket
 export function openSubcriptionToCoinbaseWebSocket(url, callback) {
   const socket = new WebSocket(url);
 
@@ -13,10 +14,12 @@ export function openSubcriptionToCoinbaseWebSocket(url, callback) {
   socket.onmessage = msg => callback(msg);
 }
 
+// makes money look like money
 export function toTwoDecimals(n) {
   return parseFloat(n).toFixed(2);
 }
 
-export function toSixSigFigs(n) {
+// six digits mostly cuz it looks nice
+export function toSixPrecision(n) {
   return parseFloat(n).toPrecision(6);
 }

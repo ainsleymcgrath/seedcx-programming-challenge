@@ -6,17 +6,15 @@ $family-sans-serif: 'Lato';
 
 // my variables
 $break-width: 350px;
-$transition-length: 250ms;
-
-* {
-    // transition: $transition-length;
-    // ^ looked cool but jittery... something to think about
-}
 
 #top-container {
     @media screen and (min-width: $break-width) {
         width: $break-width;
       }
+}
+
+#rows-shown-input {
+    width: 2rem;
 }
 
 @import "./node_modules/bulma/bulma.sass";

@@ -4,6 +4,7 @@ import MidpointPricerow from "./MidpointPriceRow";
 
 export default function OrderBook(props) {
   return (
+    // giant header sorry
     <div className="columns is-multiline is-mobile">
       <div className="column is-full">
         <div className="level is-mobile">
@@ -20,6 +21,7 @@ export default function OrderBook(props) {
         </div>
       </div>
       <div className="box column is-full">
+        {/* asks section */}
         <div className="column is-full has-text-danger">
           <span className="help has-text-centered">(asks)</span>
           {props.asks.map(o => (
@@ -27,6 +29,7 @@ export default function OrderBook(props) {
           ))}
         </div>
         <MidpointPricerow {...props.lastMatch} />
+        {/* bids section */}
         <div className="column is-full has-text-success">
           {props.bids.map(o => (
             <OrderRow {...o} key={o.price} />
