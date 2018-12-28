@@ -5,7 +5,7 @@ import {
   toTwoDecimals,
   toSixPrecision
 } from "../helpers";
-import { WEBSOCKET_URL } from "../CONSTANTS";
+import { WEBSOCKET_URL, ANOMALOUSLY_HIGH_PRICE } from "../CONSTANTS";
 import OrderBook from "./OrderBook";
 import RowsShownControl from "./RowsShownControl";
 
@@ -24,17 +24,22 @@ export default class App extends Component {
   componentDidMount() {
     openSubcriptionToCoinbaseWebSocket(WEBSOCKET_URL, msg => {
       const msgData = JSON.parse(msg.data);
-      if (msgData.type == "snapshot") {
+
+      if (msgData.type == "snapshot" && false) {
         const { bids, asks } = msgData;
 
-        // prettier-ignore
-        const rearrange = x =>
-          x.sort((a, b) => toSixPrecision(b[0]) - toSixPrecision(a[0]))
-            .map(([price, size]) => ({ [toTwoDecimals(price)]: { size } }))
-            .slice(1, this.state.ordersShown)
+        const rearrange = orders =>
+          orders
+            .filter(([price]) => parseFloat(price) < ANOMALOUSLY_HIGH_PRICE)
+            .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]))
+            .map(([price, size]) => ({ [price]: { size } }))
+            .slice(0, this.state.ordersShown)
             .reduce((acc, cur) => ({ ...acc, ...cur }));
 
-        this.setState({ bids: rearrange(bids), asks: rearrange(asks) });
+        this.setState({
+          bids: rearrange(bids),
+          asks: rearrange(asks)
+        });
       }
 
       // don't start updating until the snapshot has come in
@@ -94,7 +99,7 @@ export default class App extends Component {
           size: x[k].size,
           time: x[k].time
         }))
-        .filter(row => row.price < 9000)
+        .filter(row => row.price < ANOMALOUSLY_HIGH_PRICE)
         .sort((a, b) => b.price - a.price)
         .slice(0, this.state.ordersShown);
 
