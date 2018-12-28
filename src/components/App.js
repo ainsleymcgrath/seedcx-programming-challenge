@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 
-import { openSubcriptionToCoinbaseWebSocket, toTwoDecimals } from "../helpers";
+import {
+  openSubcriptionToCoinbaseWebSocket,
+  toTwoDecimals,
+  toSixPrecision
+} from "../helpers";
 import { WEBSOCKET_URL } from "../CONSTANTS";
 import OrderBook from "./OrderBook";
 import RowsShownControl from "./RowsShownControl";
@@ -20,7 +24,20 @@ export default class App extends Component {
   componentDidMount() {
     openSubcriptionToCoinbaseWebSocket(WEBSOCKET_URL, msg => {
       const msgData = JSON.parse(msg.data);
+      if (msgData.type == "snapshot") {
+        const { bids, asks } = msgData;
 
+        // prettier-ignore
+        const rearrange = x =>
+          x.sort((a, b) => toSixPrecision(b[0]) - toSixPrecision(a[0]))
+            .map(([price, size]) => ({ [toTwoDecimals(price)]: { size } }))
+            .slice(1, this.state.ordersShown)
+            .reduce((acc, cur) => ({ ...acc, ...cur }));
+
+        this.setState({ bids: rearrange(bids), asks: rearrange(asks) });
+      }
+
+      // don't start updating until the snapshot has come in
       if (msgData.type === "l2update") {
         const { time, product_id } = msgData;
 
@@ -33,11 +50,16 @@ export default class App extends Component {
         // ^ line up `type` with the names used for state
 
         const orderBookUpdate = {
-          [toTwoDecimals(price)]: { size, time }
+          [toTwoDecimals(price)]: { size: toSixPrecision(size), time }
         };
 
-        // coinbase says size 0 should be ignored: https://docs.pro.coinbase.com/#the-level2-channel
-        if (parseInt(size) !== 0) {
+        // coinbase says size 0 should be removed from the boook: https://docs.pro.coinbase.com/#the-level2-channel
+        if (parseInt(size) === 0 && this.state[type] !== {}) {
+          this.setState(state => {
+            delete state[type][toTwoDecimals(price)];
+            return { [type]: state[type] };
+          });
+        } else {
           this.setState(state => ({
             [type]: { ...state[type], ...orderBookUpdate }
           }));
@@ -67,9 +89,14 @@ export default class App extends Component {
     // in a more advantageous shape for <OrderRow/>
     const rearrange = x =>
       Object.keys(x)
-        .map(k => ({ price: k, size: x[k].size, time: x[k].time }))
-        .sort((a, b) => a.time - b.time)
-        .slice(-this.state.ordersShown);
+        .map(k => ({
+          price: k,
+          size: x[k].size,
+          time: x[k].time
+        }))
+        .filter(row => row.price < 9000)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, this.state.ordersShown);
 
     return (
       <div>
